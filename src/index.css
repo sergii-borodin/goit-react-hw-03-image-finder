@@ -1,8 +1,20 @@
 @import 'modern-normalize/modern-normalize.css'; /* bring in normalize.css styles */
 
+html {
+  box-sizing: border-box;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
 * {
   margin: 0;
   padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 body {
@@ -17,6 +29,12 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 li {
