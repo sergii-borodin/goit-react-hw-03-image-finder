@@ -1,4 +1,5 @@
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
+import Button from 'components/Button/Button';
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 
@@ -8,12 +9,15 @@ export default class ImageGallery extends Component {
     
     state = {
         images: [],
+        page: 1,
     }
     
     componentDidUpdate(prevProps, prevState) { 
-        if (prevProps.imageName !== this.props.imageName) {
+        const searchWord = this.props.imageName;
+        if (prevProps.imageName !== searchWord) {
             const API_KEY = '33114079-512de0a5f20d2e91152223fbb';
-            fetch(`https://pixabay.com/api/?q=cat&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`)
+            const API_URL = `https://pixabay.com/api/?q=${searchWord}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`;
+            fetch(API_URL)
                 .then(response => response.json())
             // .then(images => console.log(images.hits))
                 .then(images => this.setState({images: images.hits})) 
@@ -22,9 +26,12 @@ export default class ImageGallery extends Component {
 
     render() {
         return (
-            <GalleryGrid className="gallery">
-                <ImageGalleryItem images={this.state.images } />
-            </GalleryGrid>
+            <>
+                <GalleryGrid className="gallery">
+                    <ImageGalleryItem images={this.state.images } />
+                </GalleryGrid>
+                <Button text={ 'Load More'} />
+            </>
             )
         }
 }
