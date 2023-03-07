@@ -1,12 +1,17 @@
-// import React from 'react'
-// import PropTypes from 'prop-types'
+import { Dna } from 'react-loader-spinner';
+import { Wrapper } from './Loader.styled';
 
-// const Loader = props => {
-//   return (
-//     <div>Loader</div>
-//   )
-// }
+const Loader = () => {
+  return (
+      <Wrapper>
+          <Dna
+  visible={true}
+  height="80"
+  width="80"
+  ariaLabel="dna-loading"
+/>
+    </Wrapper>
+  )
+}
 
-// Loader.propTypes = {}
-
-// export default Loader
+export default Loader

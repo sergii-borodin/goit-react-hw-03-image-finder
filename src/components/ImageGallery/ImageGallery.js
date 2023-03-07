@@ -2,6 +2,9 @@ import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Button from 'components/Button/Button';
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import Loader from 'components/Loader/Loader';
+import Modal from 'components/Modal/Modal';
+import fetchImages from 'components/API/fetchImages';
 
 import { GalleryGrid } from './ImageGallery.styled';
 
@@ -10,30 +13,77 @@ export default class ImageGallery extends Component {
     state = {
         images: [],
         page: 1,
+        error : null,
+        status: 'idle',
+        modalImage: '',
     }
     
     componentDidUpdate(prevProps, prevState) { 
         const searchWord = this.props.imageName;
-        if (prevProps.imageName !== searchWord) {
-            const API_KEY = '33114079-512de0a5f20d2e91152223fbb';
-            const API_URL = `https://pixabay.com/api/?q=${searchWord}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`;
-            fetch(API_URL)
+        const currentPage = this.state.page;
+        
+        
+        if (prevProps.imageName !== searchWord || prevState.page !== currentPage) {
+            this.setState({status: 'pending'});
+            if (prevProps.imageName !== searchWord) {
+                this.resetPage();
+                this.resetImages();
+    }
+            setTimeout(() => {
+                fetchImages(searchWord, currentPage)
                 .then(response => response.json())
-            // .then(images => console.log(images.hits))
-                .then(images => this.setState({images: images.hits})) 
+                .then(newImages => newImages.hits.length === 0 ? this.setState({status: 'no matches'}) : this.setState(prevState => {
+                    return { images: [...prevState.images, ...newImages.hits], status: 'resolved' }
+                }))
+                .catch(error => this.setState({ error, status: 'rejected' }))
+            }, 1000);
         }
     } 
 
+    resetImages = () => {
+        this.setState({ images: [] });
+    }
+
+    getToNextPage = () => {
+        this.setState(prevState => ({ page: prevState.page + 1 }));
+    }
+
+    resetPage = () => {
+        this.setState({ page: 1 });
+    }
+
+    setModalImage = (modalImage) => {
+        this.setState({ modalImage: modalImage })
+    }
+
     render() {
-        return (
+
+        const { status, modalImage } = this.state;
+
+        if (status === 'idle') {
+            return <></>
+        }
+        if (status === 'pending') {
+            return <Loader/>
+        }
+        if (status === 'rejected') {
+            return <p>Something went wrong</p>
+        }
+        if (status === 'no matches') {
+            return <p>No matches found. Try to modify your search parameters!</p>
+        }
+        if (status === 'resolved') {
+            return (
             <>
                 <GalleryGrid className="gallery">
-                    <ImageGalleryItem images={this.state.images } />
+                    <ImageGalleryItem images={this.state.images } setModalImage={this.setModalImage} />
                 </GalleryGrid>
-                <Button text={ 'Load More'} />
+                    <Button getToNextPage={this.getToNextPage} text={'Load More'} />
+                    {modalImage !== '' && <Modal>{modalImage}</Modal>}
             </>
             )
         }
+    }
 }
     
 ImageGallery.propTypes = {

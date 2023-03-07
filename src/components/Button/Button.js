@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import { MainButton } from './Button.styled'
 
-const Button = ({text}) => {
+const Button = ({text, getToNextPage}) => {
   return (
-      <MainButton type='button'>{ text }</MainButton>
+      <MainButton onClick={getToNextPage} type='button'>{ text }</MainButton>
   )
 }
 
