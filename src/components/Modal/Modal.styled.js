@@ -11,12 +11,11 @@ export const ModalBackdrop = styled.div`
 
 export const ModalContent = styled.div`
   position: absolute;
-  top: 20%;
-  left: 20%;
-  transform: translate()-50%, -50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   height: 600px;
-  width: 890px;
-  padding: 12px;
+  width: 920px;
   background-color: rgb(255,255,255);
   border-radius: 3px;
   box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2),

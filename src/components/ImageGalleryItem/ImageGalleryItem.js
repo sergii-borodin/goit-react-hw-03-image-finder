@@ -6,12 +6,12 @@ import { ListItem, Image } from './ImageGalleryItem.styled'
 
 const ImageGalleryItem = ({ images, setModalImage  }) => {
 
-   const onImageClick = (image) => {
-       setModalImage(image);
+    const onImageClick = (image, tags) => {
+       setModalImage(image, tags);
     }
     return (<>
         {images.map(({ id, webformatURL, largeImageURL, tags }) => 
-    <ListItem key={id} onClick={() => onImageClick(largeImageURL)}>
+    <ListItem key={id} onClick={() => onImageClick(largeImageURL, tags)}>
         <Image src={webformatURL} alt={tags} />
     </ListItem>)}
  </>

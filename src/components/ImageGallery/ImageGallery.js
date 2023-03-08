@@ -16,6 +16,7 @@ export default class ImageGallery extends Component {
         error : null,
         status: 'idle',
         modalImage: '',
+        modalImageTags: '',
     }
     
     componentDidUpdate(prevProps, prevState) { 
@@ -28,15 +29,16 @@ export default class ImageGallery extends Component {
             if (prevProps.imageName !== searchWord) {
                 this.resetPage();
                 this.resetImages();
-    }
-            setTimeout(() => {
-                fetchImages(searchWord, currentPage)
+            }
+            console.log('fetching');
+                setTimeout(() => {
+                    fetchImages(searchWord, currentPage)
                 .then(response => response.json())
                 .then(newImages => newImages.hits.length === 0 ? this.setState({status: 'no matches'}) : this.setState(prevState => {
                     return { images: [...prevState.images, ...newImages.hits], status: 'resolved' }
                 }))
                 .catch(error => this.setState({ error, status: 'rejected' }))
-            }, 1000);
+                }, 1000);
         }
     } 
 
@@ -52,19 +54,27 @@ export default class ImageGallery extends Component {
         this.setState({ page: 1 });
     }
 
-    setModalImage = (modalImage) => {
-        this.setState({ modalImage: modalImage })
+    showModal = (modalImage, tags) => {
+        this.setState({ modalImage: modalImage, modalImageTags: tags })
+    }
+
+    closeModal = () => {
+        this.setState({ modalImage: '', modalImageTags: '' })
     }
 
     render() {
 
         const { status, modalImage } = this.state;
 
-        if (status === 'idle') {
-            return <></>
-        }
         if (status === 'pending') {
-            return <Loader/>
+            return <>
+                <GalleryGrid className="gallery">
+                    <ImageGalleryItem images={this.state.images } setModalImage={this.showModal} />
+                </GalleryGrid>
+                <Loader />
+                {modalImage !== '' && <Modal closeModal={this.closeModal}>{modalImage}</Modal>}
+            </>
+            
         }
         if (status === 'rejected') {
             return <p>Something went wrong</p>
@@ -76,10 +86,10 @@ export default class ImageGallery extends Component {
             return (
             <>
                 <GalleryGrid className="gallery">
-                    <ImageGalleryItem images={this.state.images } setModalImage={this.setModalImage} />
+                    <ImageGalleryItem images={this.state.images } setModalImage={this.showModal} />
                 </GalleryGrid>
                     <Button getToNextPage={this.getToNextPage} text={'Load More'} />
-                    {modalImage !== '' && <Modal>{modalImage}</Modal>}
+                    {modalImage !== '' && <Modal closeModal={this.closeModal}>{modalImage}</Modal>}
             </>
             )
         }
