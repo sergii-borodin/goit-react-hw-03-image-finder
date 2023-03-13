@@ -7,12 +7,10 @@ export class Modal extends Component {
 
     componentDidMount() { 
         window.addEventListener('keydown', this.onEscPress)
-        window.addEventListener('click', this.onBackdropClick)
     }
 
     componentWillUnmount() { 
         window.removeEventListener('keydown', this.onEscPress)
-        window.removeEventListener('click', this.onBackdropClick)
     }
     
     onEscPress = (e) => {
@@ -38,6 +36,8 @@ export class Modal extends Component {
     )
   }
 }
-Modal.propTypes = {}
+Modal.propTypes = {
+    closeModal: PropTypes.func.isRequired,
+}
 
 export default Modal

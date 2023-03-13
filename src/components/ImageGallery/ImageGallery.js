@@ -12,33 +12,43 @@ export default class ImageGallery extends Component {
     
     state = {
         images: [],
-        page: 1,
         error : null,
         status: 'idle',
         modalImage: '',
         modalImageTags: '',
+        isLastPageReached: false,
     }
     
     componentDidUpdate(prevProps, prevState) { 
         const searchWord = this.props.imageName;
-        const currentPage = this.state.page;
+        const currentPage = this.props.page;
         
+        if (currentPage > 1) {
+                const CARD_HEIGHT = 300; // preview image height
+                window.scrollBy({
+                    top: CARD_HEIGHT * 2,
+                    behavior: 'smooth',
+                });
+            };
         
-        if (prevProps.imageName !== searchWord || prevState.page !== currentPage) {
-            this.setState({status: 'pending'});
+        if (prevProps.imageName !== searchWord || prevProps.page !== currentPage) {
+            this.setState({ status: 'pending' });
+
             if (prevProps.imageName !== searchWord) {
-                this.resetPage();
                 this.resetImages();
             }
-            console.log('fetching');
-                setTimeout(() => {
                     fetchImages(searchWord, currentPage)
-                .then(response => response.json())
-                .then(newImages => newImages.hits.length === 0 ? this.setState({status: 'no matches'}) : this.setState(prevState => {
+                        .then(newImages => {
+                            const totalPages = (newImages.totalHits / 12 + 1).toFixed();
+                            if (+totalPages === currentPage) {
+                                this.setState({ isLastPageReached: true });
+                            }
+
+                        return newImages.hits.length === 0 ? this.setState({status: 'no matches'}) : this.setState(prevState => {
                     return { images: [...prevState.images, ...newImages.hits], status: 'resolved' }
-                }))
+                })
+                    })
                 .catch(error => this.setState({ error, status: 'rejected' }))
-                }, 1000);
         }
     } 
 
@@ -46,12 +56,8 @@ export default class ImageGallery extends Component {
         this.setState({ images: [] });
     }
 
-    getToNextPage = () => {
-        this.setState(prevState => ({ page: prevState.page + 1 }));
-    }
-
-    resetPage = () => {
-        this.setState({ page: 1 });
+    onLoadMoreButtonClick = () => {
+        this.props.getToNextPage();
     }
 
     showModal = (modalImage, tags) => {
@@ -64,8 +70,9 @@ export default class ImageGallery extends Component {
 
     render() {
 
+        
         const { status, modalImage } = this.state;
-
+        
         if (status === 'pending') {
             return <>
                 <GalleryGrid className="gallery">
@@ -88,7 +95,8 @@ export default class ImageGallery extends Component {
                 <GalleryGrid className="gallery">
                     <ImageGalleryItem images={this.state.images } setModalImage={this.showModal} />
                 </GalleryGrid>
-                    <Button getToNextPage={this.getToNextPage} text={'Load More'} />
+                    {!this.state.isLastPageReached && <Button onClick={this.onLoadMoreButtonClick} text={'Load More'} />}
+                    
                     {modalImage !== '' && <Modal closeModal={this.closeModal}>{modalImage}</Modal>}
             </>
             )

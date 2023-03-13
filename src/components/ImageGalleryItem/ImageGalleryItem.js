@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-// import Modal from 'components/Modal/Modal'
 
 import { ListItem, Image } from './ImageGalleryItem.styled'
 
@@ -20,7 +19,12 @@ const ImageGalleryItem = ({ images, setModalImage  }) => {
 
 ImageGalleryItem.propTypes = {
     images: PropTypes.arrayOf(
-        PropTypes.object,
+        PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            webformatURL: PropTypes.string.isRequired,
+            largeImageURL: PropTypes.string.isRequired,
+            tags: PropTypes.string.isRequired,
+        })
     )
 }
 

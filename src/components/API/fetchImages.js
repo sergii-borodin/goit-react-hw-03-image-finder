@@ -3,6 +3,11 @@ const fetchData = (searchWord, currentPage) => {
     const API_URL = `https://pixabay.com/api/?q=${searchWord}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`;
 
     return fetch(API_URL)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+        })
 }
 
 export default fetchData
