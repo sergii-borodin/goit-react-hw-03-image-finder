@@ -1,20 +1,36 @@
-import React from 'react'
+import React, { Component } from 'react'
+import Modal from 'components/Modal/Modal';
+
 import PropTypes from 'prop-types'
 
 import { ListItem, Image } from './ImageGalleryItem.styled'
 
-const ImageGalleryItem = ({ images, setModalImage  }) => {
+export default class ImageGalleryItem extends Component {
 
-    const onImageClick = (image, tags) => {
-       setModalImage(image, tags);
+    state = {
+        modalImage: '',
+        modalImageTags: '',
     }
-    return (<>
-        {images.map(({ id, webformatURL, largeImageURL, tags }) => 
-    <ListItem key={id} onClick={() => onImageClick(largeImageURL, tags)}>
-        <Image src={webformatURL} alt={tags} />
-    </ListItem>)}
- </>
-  )
+
+    showModal = (modalImage, tags) => {
+        this.setState({ modalImage: modalImage, modalImageTags: tags });
+    };
+
+    closeModal = () => {
+        this.setState({ modalImage: '', modalImageTags: '' });
+    };
+
+    render() {
+        const { modalImage, modalImageTags } = this.state;
+        return (<>
+                {this.props.images.map(({ id, webformatURL, largeImageURL, tags }) => 
+            <ListItem key={id} onClick={() => this.showModal(largeImageURL, tags)}>
+                <Image src={webformatURL} alt={tags} />
+            </ListItem>)}
+                {modalImage !== '' && <Modal closeModal={this.closeModal} tags={modalImageTags}>{modalImage}</Modal>}
+
+         </>)
+    }
 }
 
 ImageGalleryItem.propTypes = {
@@ -28,4 +44,3 @@ ImageGalleryItem.propTypes = {
     )
 }
 
-export default ImageGalleryItem
